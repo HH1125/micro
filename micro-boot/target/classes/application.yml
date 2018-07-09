@@ -2,31 +2,6 @@ spring:
   profiles:
     active: dev 
 ---
-myredis:
-  redis-one:
-    host: 192.168.188.131
-    port: 6379
-    password: mldnjava
-    timeout: 5000
-    database: 0
-    jedis:
-      pool:
-        max-idle: 10
-        max-wait: 100
-        max-active: 10
-        min-idle: 2
-  redis-two:
-    host: 192.168.188.131
-    port: 6379
-    password: mldnjava
-    timeout: 5000
-    database: 1
-    jedis:
-      pool:
-        max-idle: 10
-        max-wait: 100
-        max-active: 10
-        min-idle: 2 
 spring:
   profiles: dev 
   messages:
