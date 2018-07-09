@@ -16,6 +16,6 @@ public class MessageAction {
 	public String msg(Model model) {
 		String message = this.messageSource.getMessage("welcome.msg", new Object[] {"高大师"}, Locale.getDefault()) ;
 		model.addAttribute("msg", message) ; // 设置request属性内容
-		return "message/message_show" ; 
+		return "message" ;  
 	}
 }
