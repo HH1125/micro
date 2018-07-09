@@ -1,12 +1,13 @@
 package cn.mldn.listener;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MessageConsumer {
-	@RabbitListener(queues="mldn.microboot.queue")
-	public void receveMessage(String text) {
-		System.out.println("【消费处理】" + text);
-	}
+	@KafkaListener(topics= {"mldn-microboot"})
+	public void receveMessage(ConsumerRecord<String, String> record) {
+		System.out.println("【消费处理】key = " + record.key() + "、value = " + record.value());
+	} 
 }

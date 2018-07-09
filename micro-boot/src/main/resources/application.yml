@@ -2,12 +2,22 @@ spring:
   profiles:
     active: dev 
 ---
-spring:
-  rabbitmq:
-    host: 192.168.188.148
-    username: mldn
-    password: java
-    virtual-host: /mldnjava
+spring: 
+  kafka:
+    bootstrap-servers:            # 定义主机列表
+    - kafka-single:9095
+    template:
+      default-topic: mldn-microboot   # 定义主题名称
+    producer:                     # 定义生产者配置
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:                   # 定义消费者配置
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: group-1             # 数据分组
+    properties:
+      sasl.mechanism: PLAIN           # 安全机制
+      security.protocol: SASL_PLAINTEXT   # 安全协议
   profiles: dev 
   messages:
     basename: i18n/Message

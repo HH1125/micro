@@ -17,10 +17,14 @@ import cn.mldn.service.IMessageService;
 @SpringBootTest(classes=StartBootMain.class)
 public class TestMessageService {
 	private static final Logger LOG = LoggerFactory.getLogger(TestMessageService.class) ;
+	static {
+		System.setProperty("java.security.auth.login.config",
+				"d:/kafka/kafka_client_jaas.conf"); 
+	}
 	@Autowired
 	private IMessageService messageService ;
 	@Test
 	public void testSend() throws Exception {
-		this.messageService.send("www.mldn.cn"); 
+		this.messageService.send("nice", "www.mldn.cn"); 
 	}
 }
