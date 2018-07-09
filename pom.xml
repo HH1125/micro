@@ -23,6 +23,7 @@
 		<resources.dir>src/main/resources</resources.dir>
 		<jdk.version>1.8</jdk.version>	<!-- 定义要使用的JDK版本 -->
 		<quartz.version>2.3.0</quartz.version>
+		<oltu.version>1.0.2</oltu.version>
 		<maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
 		<spring-boot-dependencies.version>2.0.3.RELEASE</spring-boot-dependencies.version>
 		<mysql-connector-java.version>5.1.38</mysql-connector-java.version>
@@ -30,6 +31,21 @@
 	</properties>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.apache.oltu.oauth2</groupId>
+				<artifactId>org.apache.oltu.oauth2.client</artifactId>
+				<version>${oltu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.oltu.oauth2</groupId>
+				<artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+				<version>${oltu.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.oltu.oauth2</groupId>
+				<artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+				<version>${oltu.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>

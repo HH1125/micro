@@ -34,6 +34,20 @@ myredis:
       max-wait: 100
 
 
+oauth: 
+  client:
+    id: mldn_client               # 保存client_id的信息
+    secret: mldnjava     # 保存client_secret的信息
+  token:        # 保存token访问地址
+    url: http://www.server.com/mldnshiro/accessToken.action
+  memberinfo:     # 获得用户信息的访问地址（此地址要在accessToken获取之后获得）
+    url: http://www.server.com/mldnshiro/memberInfo.action
+  redirect:   # 保存返回的地址（此地址要与之前的OAuthFilter对应上）
+    uri: http://www.client.com:8080/shiro-oauth
+  login:     # 定义登录访问路径地址
+    url: http://www.server.com/mldnshiro/authorize.action?client_id=mldn_client&response_type=code&redirect_uri=http://www.client.com:8080/shiro-oauth
+
+
 
 mybatis:
   config-location: classpath:mybatis/mybatis.cfg.xml  # 定义mybatis核心配置文件的路径

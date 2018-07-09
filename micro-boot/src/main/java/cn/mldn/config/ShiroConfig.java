@@ -17,7 +17,6 @@ import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.filter.authc.LogoutFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -25,15 +24,16 @@ import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
+import cn.mldn.shiro.filter.OAuthAuthenticatingFilter;
 import cn.mldn.shiro.job.DefaultQuartzSessionValidationScheduler;
-import cn.mldn.shiro.realm.MemberRealm;
-import cn.mldn.shiro.realm.matcher.DefaultCredentialsMatcher;
+import cn.mldn.shiro.realm.OAuthRealm;
 import cn.mldn.shiro.util.cache.manager.RedisCacheManager;
 
 @Configuration
@@ -42,6 +42,7 @@ public class ShiroConfig {
 	public static final String LOGIN_URL = "/loginPage" ;
 	public static final String UNAUTHORIZED_URL = "/unauth" ;
 	public static final String SUCCESS_URL = "/pages/back/welcome" ;
+	public static final String FAILURE_URL = "/oauthFailure" ;
 	
 	@Resource(name = "redisConnectionFactory")
 	private RedisConnectionFactory redisConnectionFactoryAuthentication;
@@ -51,16 +52,34 @@ public class ShiroConfig {
 	private RedisConnectionFactory redisConnectionFactoryActiveSessionCache; 
 	
 	
-	@Bean
-	public MemberRealm getRealm() {// 1、获取配置的Realm，之所以没使用注解配置，是因为此处需要考虑到加密处理
-		MemberRealm realm = new MemberRealm();
-		realm.setCredentialsMatcher(new DefaultCredentialsMatcher());	
+	@Bean("oauthFilter")
+	public OAuthRealm getRealm(
+			@Value("${oauth.client.id}") String clientId ,
+			@Value("${oauth.client.secret}") String clientSecret ,
+			@Value("${oauth.redirect.uri}") String redirectUri ,
+			@Value("${oauth.token.url}") String accessTokenUrl ,
+			@Value("${oauth.memberinfo.url}") String memberInfoUrl
+			) {// 1、获取配置的Realm，之所以没使用注解配置，是因为此处需要考虑到加密处理
+		OAuthRealm realm = new OAuthRealm();
+		
+		System.err.println("********** accessTokenUrl = " + accessTokenUrl);
+		System.err.println("********** clientId = " + clientId);
+		System.err.println("********** redirectUri = " + redirectUri);
+		
+		// realm.setCredentialsMatcher(new DefaultCredentialsMatcher());	
 		realm.setAuthenticationCachingEnabled(true);
 		realm.setAuthenticationCacheName("authenticationCache");
 		realm.setAuthorizationCachingEnabled(true);
 		realm.setAuthorizationCacheName("authorizationCache");
+		realm.setAccessTokenUrl(accessTokenUrl);
+		realm.setClientId(clientId);
+		realm.setClientSecret(clientSecret);
+		realm.setRedirectUri(redirectUri);
+		realm.setMemberInfoUrl(memberInfoUrl);
 		return realm;
 	}
+	
+	
 	@Bean(name = "lifecycleBeanPostProcessor")
 	public LifecycleBeanPostProcessor getLifecycleBeanPostProcessor() {
 		return new LifecycleBeanPostProcessor();
@@ -161,14 +180,11 @@ public class ShiroConfig {
 		securityManager.setRememberMeManager(rememberMeManager);
 		return securityManager;
 	}
-	public FormAuthenticationFilter getLoginFilter() { // 在ShiroFilterFactoryBean中使用
-		FormAuthenticationFilter filter = new FormAuthenticationFilter();
-		filter.setUsernameParam("mid");
-		filter.setPasswordParam("password");
-		filter.setRememberMeParam("rememberMe");
-		filter.setLoginUrl(LOGIN_URL);	// 登录提交页面
-		filter.setFailureKeyAttribute("error");
-		return filter;
+	public Filter getOAuthFilter() {  // 定义专门用于oauth处理的Filter
+		OAuthAuthenticatingFilter oauthFilter = new OAuthAuthenticatingFilter() ;
+		oauthFilter.setFailureUrl(FAILURE_URL);
+		oauthFilter.setAuthcodeParam("code");
+		return oauthFilter ;
 	}
 	public LogoutFilter getLogoutFilter() { // 在ShiroFilterFactoryBean中使用
 		LogoutFilter logoutFilter = new LogoutFilter();
@@ -176,20 +192,22 @@ public class ShiroConfig {
 		return logoutFilter;
 	}
 	@Bean
-	public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
+	public ShiroFilterFactoryBean getShiroFilterFactoryBean(
+			@Value("${oauth.login.url}")	 String oauthLoginUrl ,
+			DefaultWebSecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		// 必须设置 SecurityManager
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
-		shiroFilterFactoryBean.setLoginUrl(LOGIN_URL);	// 设置登录页路径
+		shiroFilterFactoryBean.setLoginUrl(oauthLoginUrl);	// 设置登录页路径
 		shiroFilterFactoryBean.setSuccessUrl(SUCCESS_URL);	// 设置跳转成功页
 		shiroFilterFactoryBean.setUnauthorizedUrl(UNAUTHORIZED_URL);	// 授权错误页
 		Map<String, Filter> filters = new HashMap<String, Filter>();
-		filters.put("authc", this.getLoginFilter());
+		filters.put("oauthAuthc", this.getOAuthFilter());
 		filters.put("logout", this.getLogoutFilter());
 		shiroFilterFactoryBean.setFilters(filters);
 		Map<String, String> filterChainDefinitionMap = new HashMap<String, String>();
 		filterChainDefinitionMap.put("/logout.page", "logout");
-		filterChainDefinitionMap.put("/loginPage", "authc");	// 定义内置登录处理
+		filterChainDefinitionMap.put("/shiro-oauth", "oauthAuthc");
 		filterChainDefinitionMap.put("/pages/**", "authc");
 		filterChainDefinitionMap.put("/*", "anon");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
