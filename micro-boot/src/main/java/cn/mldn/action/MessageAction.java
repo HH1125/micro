@@ -17,7 +17,7 @@ public class MessageAction {
 		model.addAttribute("age", 18) ;
 		model.addAttribute("name", "mldn") ;
 		List<Message> allMessages = new ArrayList<Message>() ;
-		for (int x = 0 ; x < 10 ; x ++) {
+		for (int x = 0 ; x < 2 ; x ++) {
 			Message msg = new Message() ;
 			msg.setMid(101L);
 			msg.setTitle("高大师今晚要回国 - x" + x);

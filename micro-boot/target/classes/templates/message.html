@@ -37,5 +37,6 @@
 			<td th:text="*{#dates.format(message.pub,'yyyy-MM-dd')}"/>
 		</tr> 
 	</table>
+	<div th:include="@{/plugins/footer} :: companyInfo" th:with="iid=2,sid=22"/>
 </body>
 </html>
