@@ -2,6 +2,10 @@ spring:
   profiles:
     active: dev 
 ---
+mybatis:
+  config-location: classpath:mybatis/mybatis.cfg.xml
+  type-aliases-package: cn.mldn.vo
+  mapper-locations: classpath:mybatis/mapper/*.xml
 spring:
   datasource: 
     type: com.alibaba.druid.pool.DruidDataSource  # 配置当前要使用的数据源的操作类型
