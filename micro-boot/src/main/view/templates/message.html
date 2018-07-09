@@ -8,11 +8,27 @@
 	<script type="text/javascript" th:src="@{/js/message.js}"></script>
 </head>
 <body>
-	<p th:text="${#httpServletRequest.getHeader('Accept-Language')}">
-	<p th:text="${#httpServletRequest.getSession().getId()}">
-	<p th:text="${#httpSession.getId()}">
-	<p th:text="${#httpServletRequest.getServletContext().getRealPath('/')}">
-	<p class="txt" th:text="'信息：' + ${msg}"/>
-	<img th:src="@{images/nophoto.jpg}">
+	<table>
+		<tr>	
+			<td>第一种显示</td>
+			<td>第二种显示</td>
+		</tr>
+		<tr>
+<td>
+	<p th:text="'消息编号：' + ${msg.mid}"/>
+	<p th:text="'消息名称：' + ${msg.title}"/>
+	<p th:text="'消息内容：' + ${msg.note}"/>
+	<p th:text="'消息价值：' + ${msg.price}"/>
+	<p th:text="'发布日期：' + *{#dates.format(msg.pub,'yyyy-MM-dd')}"/>
+</td> 
+<td th:object="${msg}">
+	<p th:text="'消息编号：' + *{mid}"/>
+	<p th:text="'消息名称：' + *{title}"/>
+	<p th:text="'消息内容：' + *{note}"/>
+	<p th:text="'消息价值：' + *{price}"/>
+	<p th:text="'发布日期：' + *{#dates.format(pub,'yyyy-MM-dd')}"/>
+</td>
+		</tr>
+	</table>
 </body>
 </html>
