@@ -8,27 +8,34 @@
 	<script type="text/javascript" th:src="@{/js/message.js}"></script>
 </head>
 <body>
+	<div>是否成年：
+		<span th:if="*{age ge 38}">
+			<span th:text="'已经是一个中年人了'"/>
+		</span>
+		<span th:unless="*{age ge 38}">
+			<span th:text="'不是一个中年人了'"/>
+		</span>
+	</div>
+	<div th:if="*{name eq 'mldn'}">
+		热烈欢迎“<span th:text="${name}"/>” 
+	</div> 
 	<table>
 		<tr>	
-			<td>第一种显示</td>
-			<td>第二种显示</td>
+			<td>ind</td>
+			<td>消息编号</td>
+			<td>标题</td>
+			<td>内容</td>
+			<td>价值</td>
+			<td>日期</td>
 		</tr>
-		<tr>
-<td>
-	<p th:text="'消息编号：' + ${msg.mid}"/>
-	<p th:text="'消息名称：' + ${msg.title}"/>
-	<p th:text="'消息内容：' + ${msg.note}"/>
-	<p th:text="'消息价值：' + ${msg.price}"/>
-	<p th:text="'发布日期：' + *{#dates.format(msg.pub,'yyyy-MM-dd')}"/>
-</td> 
-<td th:object="${msg}">
-	<p th:text="'消息编号：' + *{mid}"/>
-	<p th:text="'消息名称：' + *{title}"/>
-	<p th:text="'消息内容：' + *{note}"/>
-	<p th:text="'消息价值：' + *{price}"/>
-	<p th:text="'发布日期：' + *{#dates.format(pub,'yyyy-MM-dd')}"/>
-</td>
-		</tr>
+		<tr th:each="message,stat : ${allMsgs}" th:class="${stat.even ? 'text-danger' : 'text-success'}">
+			<td th:text="${stat.index}"/> 
+			<td th:text="${message.mid}"/> 
+			<td th:text="${message.title}"/>
+			<td th:text="${message.note}"/>
+			<td th:text="${message.price}"/>
+			<td th:text="*{#dates.format(message.pub,'yyyy-MM-dd')}"/>
+		</tr> 
 	</table>
 </body>
 </html>
