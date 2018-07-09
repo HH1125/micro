@@ -3,6 +3,18 @@ spring:
     active: dev 
 ---
 spring:
+  redis:
+    host: 192.168.188.131
+    port: 6379
+    password: mldnjava
+    timeout: 5000
+    database: 0
+    jedis:
+      pool:
+        max-idle: 10
+        max-wait: 100
+        max-active: 10
+        min-idle: 2
   profiles: dev
   messages:
     basename: i18n/Message
@@ -13,17 +25,3 @@ spring:
     mode: LEGACYHTML5
 server: 
   port: 80
----
-spring:
-  profiles: beta
-  messages:
-    basename: i18n/Message
-server: 
-  port: 8082
----
-spring:
-  profiles: product
-  messages:
-    basename: i18n/Message
-server: 
-  port: 8083
